@@ -34,7 +34,8 @@
 // Character color: blink|back|text
 #define BLINK   (0<<7)
 #define BACK    (BLACK<<4)
-#define TEXT    WHITE 
+#define TEXT    WHITE
+// CHAR_COLOR = (00000000 | 00000000 | 00001111)
 #define CHAR_COLOR (BLINK|BACK|TEXT)
 
 void init_console();
