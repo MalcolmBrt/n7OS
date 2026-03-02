@@ -12,7 +12,15 @@
  * 
  */
 typedef struct {
-    // a completer
+    uint8_t P:1; // veut dire que P utilise qu'un seul bit
+    uint8_t W:1;
+    uint8_t U:1;
+    uint8_t RSVD1:2;
+    uint8_t A:1;
+    uint8_t D:1;
+    uint8_t RSVD2:2;
+    uint8_t AVAIL:3;
+    uint32_t Page:20;
 } page_table_entry_t;
 
 /**
