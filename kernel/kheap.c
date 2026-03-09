@@ -22,6 +22,7 @@ uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys) {
     return address;
 }
 
+// aligné sur la page
 uint32_t kmalloc_a(uint32_t sz) {
     return kmalloc_int(sz, 1, 0);
 }

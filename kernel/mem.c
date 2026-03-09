@@ -37,7 +37,6 @@ void clearPage(uint32_t addr) {
  * @return uint32_t Adresse de la page sélectionnée
  */
 uint32_t findfreePage() {
-    // faut il privilégier les "uint_" ou simple int ?
     for (int row = 0; row < PAGES_TABLE_SIZE; row++) {
         for (int col = 0; col < 32; col++) {
             // ET logique pour vérifier si le jème bit est a 0
@@ -45,7 +44,7 @@ uint32_t findfreePage() {
                 // alloue la page
                 free_page_bitmap_table[row] = free_page_bitmap_table[row] | (1 << col);
                 // calcul l'adresse
-                uint32_t page_index = (row * 32) + col;
+                uint32_t page_index = row * 32 + col;
                 return page_index * PAGE_SIZE;
             }
         }
@@ -58,7 +57,10 @@ uint32_t findfreePage() {
  * 
  */
 void init_mem() {
-
+    // initialise toutes les pages comme libre
+    for (int i = 0; i < PAGES_TABLE_SIZE; i++) {
+        free_page_bitmap_table[i] = 0;
+    }
 }
 
 /**
