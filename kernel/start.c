@@ -7,8 +7,11 @@ void kernel_start(void)
 {
     init_console();
     setup_base(0 /* la memoire virtuelle n'est pas encore definie */);
-    printf("bonjour\n");
-    printf("au revoir\r");
+    
+    alloc_page_entry(0xA000000);
+    uint32_t *ptr = (uint32_t *) 0xA000000;
+    int page_fault = *ptr;
+    page_fault++;
 
 
     
