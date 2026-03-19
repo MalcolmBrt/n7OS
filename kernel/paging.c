@@ -6,8 +6,22 @@
 
 PageTable repertoire_pages;
 
-void initialise_paging()
-{
+void setPageEntry(PTE *page_table_entry, uint32_t new_page, int is_writeable, int is_kernel) {
+  page_table_entry->page_entry.P= 1;
+  page_table_entry->page_entry.A= 0;
+  page_table_entry->page_entry.D= 0;
+  page_table_entry->page_entry.W= is_writeable;
+  page_table_entry->page_entry.U= ~is_kernel;
+  page_table_entry->page_entry.Page= new_page>>12;
+}
+
+
+
+void initialise_paging() {
+    uint32_t index = 0;
+    
+    init_mem();
+
     repertoire_pages = (PageTable)kmalloc_a(4096);
 
     // rempli les 4096 octets par des 0 par sécurité
@@ -30,11 +44,9 @@ void initialise_paging()
             }
         }
 
-        repertoire_pages[i].page_entry.U = 0;
         repertoire_pages[i].page_entry.P = 1;
         repertoire_pages[i].page_entry.W = 1;
-
-        // On donne l'adresse physique de la table (décalée de 12 bits)
+        repertoire_pages[i].page_entry.U = 1; // On ouvre le répertoire aux utilisateurs
         repertoire_pages[i].page_entry.Page = ((uint32_t)table_pages) >> 12;
     }
 
@@ -71,8 +83,8 @@ PageTable alloc_page_entry(uint32_t address, int is_writeable, int is_kernel) {
 
     // Configurer l'entrée dans la table avec la nouvelle page physique
     pgtab[table_index].page_entry.P = 1;
-    pgtab[table_index].page_entry.W = is_writeable ? 1 : 0;
-    pgtab[table_index].page_entry.U = is_kernel ? 0 : 1; 
+    pgtab[table_index].page_entry.W = is_writeable;
+    pgtab[table_index].page_entry.U = ~is_kernel; 
     
     // Décaler l'adresse physique de 12 bits vers la droite pour le bit-field
     pgtab[table_index].page_entry.Page = (phys_page >> 12);
