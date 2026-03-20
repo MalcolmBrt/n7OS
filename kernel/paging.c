@@ -4,7 +4,11 @@
 #include <n7OS/mem.h>
 #include <string.h> // pour memset()
 
-PageTable repertoire_pages;
+PageDirectory repertoire_pages;
+
+PageDirectory getRepPage() {
+    return repertoire_pages;
+}
 
 void setPageEntry(PTE *page_table_entry, uint32_t new_page, int is_writeable, int is_kernel) {
   page_table_entry->page_entry.P= 1;
@@ -19,16 +23,16 @@ void setPageEntry(PTE *page_table_entry, uint32_t new_page, int is_writeable, in
 
 void initialise_paging() {
     uint32_t index = 0;
-    
+    init_kheap();
     init_mem();
 
-    repertoire_pages = (PageTable)kmalloc_a(4096);
+    repertoire_pages = (PageDirectory)kmalloc_a(sizeof(PDE)*1024);
 
     // rempli les 4096 octets par des 0 par sécurité
     memset(repertoire_pages, 0, 4096);
 
     for (int i = 0; i < 1024; i++) {
-        PageTable table_pages = (PageTable)kmalloc_a(4096);
+        PageTable table_pages = (PageTable)kmalloc_a(sizeof(PTE)*1024);
         memset(table_pages, 0, 4096);
 
 

@@ -6,21 +6,22 @@
 
 void kernel_start(void)
 {
-    setup_base(0 /* la memoire virtuelle n'est pas encore definie */);
     init_console();
     initialise_paging();
+    
+    // 3. On configure les interruptions en leur donnant accès à notre mémoire virtuelle !
+    setup_base((uint32_t) getRepPage());
+    
 
-    // lancement des interruptions
+    //init_syscall();
+
+    //init_irq();
+
     sti();
-
-    printf("bonjour");
     
     //alloc_page_entry(0xA000000, 1, 0);
-    uint32_t *ptr = (uint32_t *) 0xA000000;
-    (*ptr)++; // pour simuler l'erreur, retirer alloc_page_entry
-
-
-
+    uint32_t *ptr = (uint32_t *) 0xA000000; // pour simuler l'erreur, retirer alloc_page_entry
+    (*ptr)++;
 
     // on ne doit jamais sortir de kernel_start
     while (1) {

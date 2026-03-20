@@ -12,16 +12,24 @@
  * 
  */
 typedef struct {
-    uint8_t P:1; // veut dire que P utilise qu'un seul bit
-    uint8_t W:1;
-    uint8_t U:1;
-    uint8_t RSVD1:2;
-    uint8_t A:1;
-    uint8_t D:1;
-    uint8_t RSVD2:2;
-    uint8_t AVAIL:3;
+    uint32_t P:1; // veut dire que P utilise qu'un seul bit
+    uint32_t W:1;
+    uint32_t U:1;
+    uint32_t RSVD1:2;
+    uint32_t A:1;
+    uint32_t D:1;
+    uint32_t RSVD2:2;
+    uint32_t AVAIL:3;
     uint32_t Page:20;
 } page_table_entry_t;
+
+typedef struct {
+    uint32_t P:1; // veut dire que P utilise qu'un seul bit
+    uint32_t W:1;
+    uint32_t U:1;
+    uint32_t Res:9;
+    uint32_t Page:20;
+} page_directory_entry_t;
 
 /**
  * @brief Une entrée dans la table de page peut être manipulée en utilisant
@@ -32,11 +40,18 @@ typedef union {
     uint32_t value;
 } PTE; // PTE = Page Table Entry 
 
+typedef union {
+    page_directory_entry_t page_entry;
+    uint32_t value;
+} PDE;
+
 /**
  * @brief Une table de page (PageTable) est un tableau de descripteurs de page
  * 
  */
 typedef PTE * PageTable;
+
+typedef PDE * PageDirectory;
 
 /**
  * @brief Cette fonction initialise le répertoire de page, alloue les pages de table du noyau
