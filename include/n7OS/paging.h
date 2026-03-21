@@ -12,7 +12,7 @@
  * 
  */
 typedef struct {
-    uint32_t P:1; // veut dire que P utilise qu'un seul bit
+    uint32_t P:1;
     uint32_t W:1;
     uint32_t U:1;
     uint32_t RSVD1:2;
@@ -24,7 +24,7 @@ typedef struct {
 } page_table_entry_t;
 
 typedef struct {
-    uint32_t P:1; // veut dire que P utilise qu'un seul bit
+    uint32_t P:1;
     uint32_t W:1;
     uint32_t U:1;
     uint32_t Res:9;

@@ -1,6 +1,6 @@
 #include <n7OS/mem.h>
 
-uint32_t free_page_bitmap_table[PAGES_TABLE_SIZE];
+uint32_t free_page_bitmap_table[PAGES_BITMAP_SIZE];
 
 /**
  * @brief Marque la page allouée
@@ -37,7 +37,7 @@ void clearPage(uint32_t addr) {
  * @return uint32_t Adresse de la page sélectionnée
  */
 uint32_t findfreePage() {
-    for (int row = 0; row < PAGES_TABLE_SIZE; row++) {
+    for (int row = 0; row < PAGES_BITMAP_SIZE; row++) {
         for (int col = 0; col < 32; col++) {
             // ET logique pour vérifier si le jème bit est a 0
             if ((free_page_bitmap_table[row] & (1 << col)) == 0) {
@@ -58,7 +58,7 @@ uint32_t findfreePage() {
  */
 void init_mem() {
     // initialise toutes les pages comme libre
-    for (int i = 0; i < PAGES_TABLE_SIZE; i++) {
+    for (int i = 0; i < PAGES_BITMAP_SIZE; i++) {
         free_page_bitmap_table[i] = 0;
     }
 }
@@ -68,5 +68,21 @@ void init_mem() {
  * 
  */
 void print_mem() {
+    printf("Pages de la memoire physique occupees :\n");
     
+    int count = 0;
+    
+    for (int i = 0; i < PAGES_BITMAP_SIZE; i++) {
+        uint32_t liste_page = free_page_bitmap_table[i];
+        // On ne traite que les blocs qui ont au moins 1 bit à 1
+        if (liste_page != 0) {
+            printf("0x%08x ", liste_page);
+            count++;
+        }
+        // Retour à la ligne tous les 4 éléments affichés 
+        if (count % 7 == 0) {
+            printf("\n");
+        }
+    }
+    printf("...\n");
 }

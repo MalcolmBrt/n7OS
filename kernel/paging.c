@@ -3,23 +3,9 @@
 #include <n7OS/kheap.h>
 #include <n7OS/mem.h>
 #include <string.h> // pour memset()
+#include <n7OS/processor_structs.h>
 
 PageDirectory repertoire_pages;
-
-PageDirectory getRepPage() {
-    return repertoire_pages;
-}
-
-void setPageEntry(PTE *page_table_entry, uint32_t new_page, int is_writeable, int is_kernel) {
-  page_table_entry->page_entry.P= 1;
-  page_table_entry->page_entry.A= 0;
-  page_table_entry->page_entry.D= 0;
-  page_table_entry->page_entry.W= is_writeable;
-  page_table_entry->page_entry.U= ~is_kernel;
-  page_table_entry->page_entry.Page= new_page>>12;
-}
-
-
 
 void initialise_paging() {
     uint32_t index = 0;
@@ -35,23 +21,16 @@ void initialise_paging() {
         PageTable table_pages = (PageTable)kmalloc_a(sizeof(PTE)*1024);
         memset(table_pages, 0, 4096);
 
-
-        // la table i=0 gère la partie de la mémoire relative au noyau (code, variables, etc.)
-        if (i == 0) {
-            for (int j = 0; j < 1024; j++) {
-                table_pages[j].page_entry.P = 1;
-                table_pages[j].page_entry.W = 1;
-                table_pages[j].page_entry.U = 0; // Réservé au noyau
-                // l'adresse physique de la page est j*4096 mais comme elle est sur 20 bits on garde les 20 bits de poids fort 
-                // ce qui revient à faire un décalage de 12 ou une une division par 4096, soit (j*4096)/4096=j
-                table_pages[j].page_entry.Page = j; // Adresse physique
-            }
-        }
-
         repertoire_pages[i].page_entry.P = 1;
         repertoire_pages[i].page_entry.W = 1;
         repertoire_pages[i].page_entry.U = 1; // On ouvre le répertoire aux utilisateurs
         repertoire_pages[i].page_entry.Page = ((uint32_t)table_pages) >> 12;
+
+        index = (uint32_t)table_pages + sizeof(PTE)*1024;
+    }
+
+    for (int i = 0; i < index; i += sizeof(PTE)*1024) {
+        alloc_page_entry(i, 1, 1);
     }
 
     // On met l'adresse du répertoire dans CR3
@@ -61,9 +40,11 @@ void initialise_paging() {
     __asm__ __volatile__("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000;
     __asm__ __volatile__("mov %0, %%cr0" ::"r"(cr0));
+
+    setup_base((uint32_t)repertoire_pages);
 }
 
-// cette fonction donne une vrai page de mémoire physique à une adresse virtuelle
+// cette fonction lie une vrai page de mémoire physique à une adresse virtuelle
 PageTable alloc_page_entry(uint32_t address, int is_writeable, int is_kernel) {
     // on garde les 10 bits de gauche, décalage de 22 bits vers la droite
     uint32_t rep_index = address >> 22;
@@ -73,11 +54,6 @@ PageTable alloc_page_entry(uint32_t address, int is_writeable, int is_kernel) {
 
     // On récupère l'adresse stockée dans le répertoire et on la re-décale vers la gauche
     PageTable pgtab = (PageTable)(repertoire_pages[rep_index].page_entry.Page << 12);
-
-    // Vérifier si la page n'est pas déjà allouée
-    if (pgtab[table_index].page_entry.P == 1) {
-        return pgtab;
-    }
 
     // Obtenir une page physique libre
     uint32_t phys_page = findfreePage();

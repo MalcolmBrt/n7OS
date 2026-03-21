@@ -18,12 +18,12 @@
 /**
  * @brief Taille d'une page en mémoire
  * 
- * Ici, 0x1000 -> 2^10 * 4 = 4096 octets
+ * Ici, 0x1000 -> 1024 * 4 = 4096 octets
  */
 #define PAGE_SIZE 0x1000
 
 #define NB_PAGES (LAST_MEMORY_INDEX+1)/PAGE_SIZE
-#define PAGES_TABLE_SIZE NB_PAGES/32
+#define PAGES_BITMAP_SIZE NB_PAGES/32
 
 /**
  * @brief Marque la page allouée
