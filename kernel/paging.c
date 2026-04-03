@@ -29,7 +29,7 @@ void initialise_paging() {
         index = (uint32_t)table_pages + sizeof(PTE)*1024;
     }
 
-    for (int i = 0; i < index; i += sizeof(PTE)*1024) {
+    for (uint32_t i = 0; i < index; i += sizeof(PTE)*1024) {
         alloc_page_entry(i, 1, 1);
     }
 

@@ -1,4 +1,5 @@
 #include <n7OS/mem.h>
+#include <stdio.h>
 
 uint32_t free_page_bitmap_table[PAGES_BITMAP_SIZE];
 

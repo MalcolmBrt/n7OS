@@ -39,6 +39,10 @@
 #define CHAR_COLOR (BLINK|BACK|TEXT)
 
 void init_console();
+void clear_screen();
+void put_cursor(uint16_t pos);
+uint16_t get_cursor();
+void console_putchar(const char c);
 
 /*
  * This is the function called by printf to send its output to the screen. You
