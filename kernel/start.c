@@ -13,15 +13,12 @@ void kernel_start(void)
 
     //init_syscall();
 
-    //init_irq();
+    init_irq();
 
     sti();
-    print_mem();
-    
-    alloc_page_entry(0xA000000, 1, 0);
-    uint32_t *ptr = (uint32_t *) 0xA000000; // pour simuler l'erreur, retirer alloc_page_entry
-    (*ptr)++;
-    print_mem();
+
+    // instruction assembleur int génère une interruption
+    __asm__ __volatile__("int $50");
 
     // on ne doit jamais sortir de kernel_start
     while (1) {
